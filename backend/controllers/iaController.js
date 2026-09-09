@@ -15,7 +15,7 @@ const consultarIA = async (req, res) => {
     const historico = historicoCru.reverse();
     const dataDeHoje = new Date().toLocaleDateString('pt-BR');
 
-    // INSTRUÇÕES ATUALIZADAS COM A CATEGORIA
+    // INSTRUÇÕES ATUALIZADAS PARA EXIGIR CATEGORIA TAMBÉM NAS TAREFAS
     const systemInstruction = `
       Você é o assistente virtual do sistema LifeOS. Hoje é dia ${dataDeHoje}.
       
@@ -24,10 +24,10 @@ const consultarIA = async (req, res) => {
       
       Para finanças:
       {"comando": "criar_financeiro", "descricao": "nome da transacao", "valor": 250.00, "tipo": "saida", "categoria": "nome da categoria"}
-      (Obs: Crie uma categoria curta e coerente com a descrição, ex: Lazer, Alimentação, Compras, Salário).
-
+      
       Para tarefas:
-      {"comando": "criar_tarefa", "titulo": "nome da tarefa"}
+      {"comando": "criar_tarefa", "titulo": "nome da tarefa", "categoria": "nome da categoria"}
+      (Obs: Crie uma categoria curta e coerente, ex: Faculdade, Casa, Trabalho, Saúde).
     `;
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -56,7 +56,6 @@ const consultarIA = async (req, res) => {
         const comando = JSON.parse(match[0]);
         
         if (comando.comando === 'criar_financeiro') {
-          // AGORA PASSAMOS A CATEGORIA PARA O BANCO DE DADOS
           await Lancamento.create({
             descricao: comando.descricao,
             valor: Number(comando.valor),
@@ -64,14 +63,16 @@ const consultarIA = async (req, res) => {
             categoria: comando.categoria,
             data: new Date()
           });
-          respostaTexto = "Financeiro atualizado.";
+          respostaTexto = "✅ Financeiro atualizado.";
         } 
         else if (comando.comando === 'criar_tarefa') {
+          // AGORA PASSAMOS A CATEGORIA DA TAREFA PARA O BANCO DE DADOS
           await Tarefa.create({
             titulo: comando.titulo,
-            status: 'Pendente'
+            status: 'Pendente',
+            categoria: comando.categoria
           });
-          respostaTexto = "Tarefa criada.";
+          respostaTexto = "✅ Tarefa criada.";
         }
       }
     } catch (e) {

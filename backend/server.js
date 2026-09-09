@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 
+
 const app = express();
 
 app.use(cors());
@@ -16,7 +17,8 @@ const tarefaRoutes = require('./routes/tarefaRoutes');
 const projetoRoutes = require('./routes/projetoRoutes');
 const estudoRoutes = require('./routes/estudoRoutes');
 const eventoRoutes = require('./routes/eventoRoutes');
-const iaRoutes = require('./routes/iaRoutes'); // <-- Módulo de Tarefas importado!
+const iaRoutes = require('./routes/iaRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('📦 Banco de dados MongoDB conectado!'))
@@ -29,7 +31,8 @@ app.use('/api/tarefas', tarefaRoutes);
 app.use('/api/projetos', projetoRoutes);
 app.use('/api/estudos', estudoRoutes);
 app.use('/api/eventos', eventoRoutes);
-app.use('/api/ia', iaRoutes); // <-- Módulo de Tarefas ativado!
+app.use('/api/ia', iaRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/api/status', (req, res) => {
   res.json({ message: 'LifeOS API está rodando perfeitamente e conectada ao banco!' });
