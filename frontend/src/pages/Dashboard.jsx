@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
-
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Dashboard() {
@@ -15,16 +14,19 @@ function Dashboard() {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const resFinancas = await fetch('http://localhost:5000/api/financeiro');
+        const token = localStorage.getItem('token'); // Puxa o crachá
+        const headers = { 'Authorization': `Bearer ${token}` }; // Monta a autorização uma vez só
+
+        const resFinancas = await fetch('http://localhost:5000/api/financeiro', { headers });
         setLancamentos(await resFinancas.json());
 
-        const resTreinos = await fetch('http://localhost:5000/api/treinos');
+        const resTreinos = await fetch('http://localhost:5000/api/treinos', { headers });
         setTreinos(await resTreinos.json());
 
-        const resTarefas = await fetch('http://localhost:5000/api/tarefas');
+        const resTarefas = await fetch('http://localhost:5000/api/tarefas', { headers });
         setTarefas(await resTarefas.json());
 
-        const resProjetos = await fetch('http://localhost:5000/api/projetos');
+        const resProjetos = await fetch('http://localhost:5000/api/projetos', { headers });
         setProjetos(await resProjetos.json());
       } catch (erro) {
         console.error('Erro ao buscar dados para o dashboard', erro);
@@ -146,7 +148,6 @@ function Dashboard() {
           )}
         </div>
       </div>
-
       
     </div>
   );

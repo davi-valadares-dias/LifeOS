@@ -15,7 +15,12 @@ function Financeiro() {
 
   const carregarLancamentos = async () => {
     try {
-      const resposta = await fetch('http://localhost:5000/api/financeiro');
+      const token = localStorage.getItem('token'); // Puxa o crachá
+      const resposta = await fetch('http://localhost:5000/api/financeiro', {
+        headers: {
+          'Authorization': `Bearer ${token}` // Mostra o crachá
+        }
+      });
       const dados = await resposta.json();
       setLancamentos(dados);
     } catch (erro) {
@@ -27,13 +32,17 @@ function Financeiro() {
     e.preventDefault(); 
     
     const dados = { descricao, valor: Number(valor), tipo };
+    const token = localStorage.getItem('token'); // Puxa o crachá
 
     try {
       if (editandoId) {
         // Se tem um ID em edição, faz um PUT para atualizar
         await fetch(`http://localhost:5000/api/financeiro/${editandoId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Mostra o crachá
+          },
           body: JSON.stringify(dados)
         });
         setEditandoId(null); // Sai do modo de edição
@@ -41,7 +50,10 @@ function Financeiro() {
         // Se não tem ID, faz um POST para criar
         await fetch('http://localhost:5000/api/financeiro', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Mostra o crachá
+          },
           body: JSON.stringify(dados)
         });
       }
@@ -66,7 +78,13 @@ function Financeiro() {
 
   const deletarLancamento = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/financeiro/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('token'); // Puxa o crachá
+      await fetch(`http://localhost:5000/api/financeiro/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}` // Mostra o crachá
+        }
+      });
       carregarLancamentos(); 
     } catch (erro) {
       console.error('Erro ao deletar lançamento', erro);

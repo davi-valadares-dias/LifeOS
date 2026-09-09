@@ -12,7 +12,10 @@ function Estudos() {
 
   const carregarDisciplinas = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/estudos');
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:5000/api/estudos', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       setDisciplinas(await res.json());
     } catch (erro) {
       console.error('Erro ao buscar disciplinas', erro);
@@ -22,9 +25,13 @@ function Estudos() {
   const salvarDisciplina = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
       await fetch('http://localhost:5000/api/estudos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ disciplina, professor, maxFaltas: Number(maxFaltas) })
       });
       setDisciplina(''); setProfessor(''); setMaxFaltas('');
@@ -36,9 +43,13 @@ function Estudos() {
 
   const adicionarFalta = async (id, faltasAtuais) => {
     try {
+      const token = localStorage.getItem('token');
       await fetch(`http://localhost:5000/api/estudos/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ faltas: faltasAtuais + 1 })
       });
       carregarDisciplinas();
@@ -49,7 +60,11 @@ function Estudos() {
 
   const deletarDisciplina = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/estudos/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('token');
+      await fetch(`http://localhost:5000/api/estudos/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       carregarDisciplinas();
     } catch (erro) {
       console.error('Erro ao deletar', erro);
@@ -58,7 +73,7 @@ function Estudos() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '900px', margin: '0 auto' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>Faculdade 📚</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>Faculdade </h1>
 
       <form onSubmit={salvarDisciplina} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '40px', backgroundColor: '#1e1e1e', padding: '20px', borderRadius: '10px', border: '1px solid #333' }}>
         <input type="text" value={disciplina} onChange={(e) => setDisciplina(e.target.value)} placeholder="Disciplina (ex: Estrutura de Dados)" required style={{ flex: 2, padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', minWidth: '200px' }} />
@@ -85,7 +100,6 @@ function Estudos() {
                   <span style={{ color: '#ddd' }}>Faltas: <strong>{item.faltas}</strong> / {item.maxFaltas}</span>
                   <button onClick={() => adicionarFalta(item._id, item.faltas)} style={{ backgroundColor: '#444', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.8rem' }}>+ Falta</button>
                 </div>
-                {/* Barrinha de progresso das faltas */}
                 <div style={{ height: '8px', width: '100%', backgroundColor: '#333', borderRadius: '4px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${Math.min(riscoFaltas, 100)}%`, backgroundColor: corRisco, transition: '0.3s' }}></div>
                 </div>

@@ -3,6 +3,9 @@ const Tarefa = require('../models/Tarefa');
 const Evento = require('../models/Evento');
 const MensagemIA = require('../models/MensagemIA');
 const Lancamento = require('../models/Lancamento'); 
+const Treino = require('../models/Treino'); 
+const Estudo = require('../models/Estudo'); 
+const Projeto = require('../models/Projeto'); // <-- Adicionado o modelo de Projetos
 
 const consultarIA = async (req, res) => {
   try {
@@ -15,19 +18,24 @@ const consultarIA = async (req, res) => {
     const historico = historicoCru.reverse();
     const dataDeHoje = new Date().toLocaleDateString('pt-BR');
 
-    // INSTRUÇÕES ATUALIZADAS PARA EXIGIR CATEGORIA TAMBÉM NAS TAREFAS
+    // INSTRUÇÕES ATUALIZADAS: Adicionado comando criar_projeto
     const systemInstruction = `
-      Você é o assistente virtual do sistema LifeOS. Hoje é dia ${dataDeHoje}.
+      Você é o assistente virtual EXCLUSIVO do sistema LifeOS. Hoje é dia ${dataDeHoje}.
       
+      [REGRA ABSOLUTA DE ESCOPO]
+      Você SÓ DEVE conversar sobre a rotina, tarefas, treinos, faculdade/estudos, calendário, projetos de programação e finanças do usuário. 
+      RECUSE EDUCADAMENTE qualquer pedido sobre outros assuntos (como escrever códigos em Python, dar receitas, contar piadas, etc). Responda sempre que o seu escopo é estritamente pessoal e focado no LifeOS.
+
       [REGRA ABSOLUTA PARA CRIAÇÃO DE DADOS]
-      Se o usuário pedir para criar, registrar, adicionar ou salvar algo no sistema, responda ÚNICA e EXCLUSIVAMENTE com um código JSON válido. Não adicione nenhuma palavra antes ou depois.
+      Se o usuário pedir para criar, registrar, adicionar ou salvar algo no sistema, responda ÚNICA e EXCLUSIVAMENTE com um código JSON válido. Não adicione nenhuma palavra antes ou depois do JSON.
       
-      Para finanças:
-      {"comando": "criar_financeiro", "descricao": "nome da transacao", "valor": 250.00, "tipo": "saida", "categoria": "nome da categoria"}
-      
-      Para tarefas:
-      {"comando": "criar_tarefa", "titulo": "nome da tarefa", "categoria": "nome da categoria"}
-      (Obs: Crie uma categoria curta e coerente, ex: Faculdade, Casa, Trabalho, Saúde).
+      Formatos aceitos:
+      Finanças: {"comando": "criar_financeiro", "descricao": "nome", "valor": 250.00, "tipo": "saida", "categoria": "nome"}
+      Tarefas: {"comando": "criar_tarefa", "titulo": "nome", "categoria": "nome"}
+      Treinos: {"comando": "criar_treino", "grupoMuscular": "Costas e Bíceps", "exerciciosFeitos": "descricao dos exercícios", "duracaoMinutos": 60}
+      Faculdade: {"comando": "criar_estudo", "disciplina": "nome da materia", "professor": "nome do professor", "maxFaltas": 10}
+      Calendário: {"comando": "criar_evento", "titulo": "nome do compromisso", "tipo": "Compromisso", "descricao": "detalhes"}
+      Projetos: {"comando": "criar_projeto", "nome": "nome do projeto", "tecnologias": "React, Node, etc", "descricao": "descrição completa", "linkGithub": "url ou vazio"}
     `;
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -41,7 +49,7 @@ const consultarIA = async (req, res) => {
     const chat = model.startChat({
       history: [
           { role: 'user', parts: [{ text: systemInstruction }] },
-          { role: 'model', parts: [{ text: 'Entendido. Responderei apenas com JSON se for um comando de criação.' }] },
+          { role: 'model', parts: [{ text: 'Entendido. Recusarei assuntos externos e responderei apenas com JSON se for um comando de criação.' }] },
           ...historicoFormatado
       ]
     });
@@ -66,13 +74,49 @@ const consultarIA = async (req, res) => {
           respostaTexto = "✅ Financeiro atualizado.";
         } 
         else if (comando.comando === 'criar_tarefa') {
-          // AGORA PASSAMOS A CATEGORIA DA TAREFA PARA O BANCO DE DADOS
           await Tarefa.create({
             titulo: comando.titulo,
             status: 'Pendente',
             categoria: comando.categoria
           });
           respostaTexto = "✅ Tarefa criada.";
+        }
+        else if (comando.comando === 'criar_treino') {
+          await Treino.create({
+            grupoMuscular: comando.grupoMuscular,
+            exerciciosFeitos: comando.exerciciosFeitos,
+            duracaoMinutos: Number(comando.duracaoMinutos),
+            data: new Date()
+          });
+          respostaTexto = "✅ Treino registrado no diário.";
+        }
+        else if (comando.comando === 'criar_estudo') {
+          await Estudo.create({
+            disciplina: comando.disciplina,
+            professor: comando.professor,
+            maxFaltas: Number(comando.maxFaltas),
+            faltas: 0
+          });
+          respostaTexto = "✅ Matéria adicionada ao painel da faculdade.";
+        }
+        else if (comando.comando === 'criar_evento') {
+          await Evento.create({
+            titulo: comando.titulo,
+            tipo: comando.tipo,
+            descricao: comando.descricao,
+            data: new Date()
+          });
+          respostaTexto = "✅ Evento adicionado ao calendário de hoje.";
+        }
+        // <-- AQUI ESTÁ A LÓGICA NOVA PARA PROJETOS
+        else if (comando.comando === 'criar_projeto') {
+          await Projeto.create({
+            nome: comando.nome,
+            descricao: comando.descricao,
+            tecnologias: comando.tecnologias,
+            linkGithub: comando.linkGithub || ''
+          });
+          respostaTexto = "✅ Projeto adicionado ao seu portfólio.";
         }
       }
     } catch (e) {

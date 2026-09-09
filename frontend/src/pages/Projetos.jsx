@@ -4,7 +4,6 @@ function Projetos() {
   const [projetos, setProjetos] = useState([]);
   const [projetoSelecionado, setProjetoSelecionado] = useState(null);
 
-  // Estados do formulário
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [tecnologias, setTecnologias] = useState('');
@@ -16,7 +15,10 @@ function Projetos() {
 
   const carregarProjetos = async () => {
     try {
-      const resposta = await fetch('http://localhost:5000/api/projetos');
+      const token = localStorage.getItem('token');
+      const resposta = await fetch('http://localhost:5000/api/projetos', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const dados = await resposta.json();
       setProjetos(dados);
     } catch (erro) {
@@ -27,9 +29,13 @@ function Projetos() {
   const salvarProjeto = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
       await fetch('http://localhost:5000/api/projetos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ nome, descricao, tecnologias, linkGithub })
       });
       setNome('');
@@ -44,17 +50,18 @@ function Projetos() {
 
   const deletarProjeto = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/projetos/${id}`, { method: 'DELETE' });
-      setProjetoSelecionado(null); // Volta para a grade se apagar o projeto aberto
+      const token = localStorage.getItem('token');
+      await fetch(`http://localhost:5000/api/projetos/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setProjetoSelecionado(null); 
       carregarProjetos();
     } catch (erro) {
       console.error('Erro ao deletar', erro);
     }
   };
 
-  // --------------------------------------------------------
-  // TELA 2: VISÃO DETALHADA DO PROJETO
-  // --------------------------------------------------------
   if (projetoSelecionado) {
     return (
       <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '0 auto' }}>
@@ -94,9 +101,6 @@ function Projetos() {
     );
   }
 
-  // --------------------------------------------------------
-  // TELA 1: FORMULÁRIO E GRADE DE CARDS
-  // --------------------------------------------------------
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '1000px', margin: '0 auto' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>Portfólio </h1>
@@ -116,7 +120,7 @@ function Projetos() {
         {projetos.map((item) => (
           <div 
             key={item._id} 
-            onClick={() => setProjetoSelecionado(item)} // Abre os detalhes ao clicar!
+            onClick={() => setProjetoSelecionado(item)} 
             style={{ backgroundColor: '#1e1e1e', padding: '20px', borderRadius: '10px', border: '1px solid #333', cursor: 'pointer', transition: '0.2s', display: 'flex', flexDirection: 'column', gap: '10px' }}
             onMouseOver={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
             onMouseOut={(e) => e.currentTarget.style.borderColor = '#333'}

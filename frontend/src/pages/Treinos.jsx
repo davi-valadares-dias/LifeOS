@@ -7,7 +7,6 @@ function Treinos() {
   const [exerciciosFeitos, setExerciciosFeitos] = useState('');
   const [duracaoMinutos, setDuracaoMinutos] = useState('');
   
-  // Controle de edição
   const [editandoId, setEditandoId] = useState(null);
 
   useEffect(() => {
@@ -16,7 +15,10 @@ function Treinos() {
 
   const carregarTreinos = async () => {
     try {
-      const resposta = await fetch('http://localhost:5000/api/treinos');
+      const token = localStorage.getItem('token');
+      const resposta = await fetch('http://localhost:5000/api/treinos', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       const dados = await resposta.json();
       setTreinos(dados);
     } catch (erro) {
@@ -32,19 +34,26 @@ function Treinos() {
       exerciciosFeitos,
       duracaoMinutos: Number(duracaoMinutos)
     };
+    const token = localStorage.getItem('token');
 
     try {
       if (editandoId) {
         await fetch(`http://localhost:5000/api/treinos/${editandoId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify(dados)
         });
         setEditandoId(null);
       } else {
         await fetch('http://localhost:5000/api/treinos', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify(dados)
         });
       }
@@ -75,7 +84,11 @@ function Treinos() {
 
   const deletarTreino = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/treinos/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('token');
+      await fetch(`http://localhost:5000/api/treinos/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       carregarTreinos(); 
     } catch (erro) {
       console.error('Erro ao deletar treino', erro);

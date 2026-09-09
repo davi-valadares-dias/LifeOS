@@ -20,7 +20,12 @@ function ChatLifeOS() {
 
   const carregarHistorico = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/ia/historico');
+      const token = localStorage.getItem('token'); // Puxa o crachá do navegador
+      const res = await fetch('http://localhost:5000/api/ia/historico', {
+        headers: {
+          'Authorization': `Bearer ${token}` // Mostra o crachá para o segurança
+        }
+      });
       const dados = await res.json();
       setMensagens(dados);
     } catch (erro) {
@@ -41,9 +46,13 @@ function ChatLifeOS() {
     setCarregando(true);
 
     try {
+      const token = localStorage.getItem('token'); // Puxa o crachá do navegador
       const res = await fetch('http://localhost:5000/api/ia', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Mostra o crachá para o segurança
+        },
         body: JSON.stringify({ pergunta: textoEnviado })
       });
       
@@ -53,7 +62,7 @@ function ChatLifeOS() {
       const novaMensagemIA = { papel: 'model', texto: dados.resposta, _id: Date.now() + 1 };
       setMensagens((prev) => [...prev, novaMensagemIA]);
     } catch (erro) {
-      toast.error('O assistente está offline.');
+      toast.error('O assistente está offline ou sem permissão.');
     } finally {
       setCarregando(false);
     }
@@ -63,7 +72,13 @@ function ChatLifeOS() {
     if (!window.confirm('Tem certeza que deseja apagar todo o histórico?')) return;
     
     try {
-      await fetch('http://localhost:5000/api/ia/limpar', { method: 'DELETE' });
+      const token = localStorage.getItem('token'); // Puxa o crachá do navegador
+      await fetch('http://localhost:5000/api/ia/limpar', { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}` // Mostra o crachá para o segurança
+        }
+      });
       setMensagens([]);
       toast.success('Conversa apagada!');
     } catch (erro) {
@@ -107,10 +122,10 @@ function ChatLifeOS() {
               borderRadius: '15px', 
               borderTopRightRadius: msg.papel === 'user' ? '0' : '15px',
               borderTopLeftRadius: msg.papel === 'model' ? '0' : '15px',
-              backgroundColor: msg.papel === 'user' ? '#a855f7' : '#222', // Roxo para o usuário, Cinza para a IA
+              backgroundColor: msg.papel === 'user' ? '#a855f7' : '#222',
               color: '#fff',
               lineHeight: '1.5',
-              whiteSpace: 'pre-wrap', // Mantém as quebras de linha da IA
+              whiteSpace: 'pre-wrap', 
               boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
             }}>
               {msg.texto}

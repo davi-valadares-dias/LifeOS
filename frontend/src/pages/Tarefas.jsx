@@ -11,7 +11,12 @@ function Tarefas() {
 
   const carregarTarefas = async () => {
     try {
-      const resposta = await fetch('http://localhost:5000/api/tarefas');
+      const token = localStorage.getItem('token'); // Puxa o crachá
+      const resposta = await fetch('http://localhost:5000/api/tarefas', {
+        headers: {
+          'Authorization': `Bearer ${token}` // Mostra o crachá
+        }
+      });
       const dados = await resposta.json();
       setTarefas(dados);
     } catch (erro) {
@@ -22,9 +27,13 @@ function Tarefas() {
   const salvarTarefa = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token'); // Puxa o crachá
       await fetch('http://localhost:5000/api/tarefas', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Mostra o crachá
+        },
         body: JSON.stringify({ titulo, categoria })
       });
       setTitulo('');
@@ -37,9 +46,13 @@ function Tarefas() {
 
   const atualizarStatus = async (id, novoStatus) => {
     try {
+      const token = localStorage.getItem('token'); // Puxa o crachá
       await fetch(`http://localhost:5000/api/tarefas/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Mostra o crachá
+        },
         body: JSON.stringify({ status: novoStatus })
       });
       carregarTarefas();
@@ -50,7 +63,13 @@ function Tarefas() {
 
   const deletarTarefa = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/tarefas/${id}`, { method: 'DELETE' });
+      const token = localStorage.getItem('token'); // Puxa o crachá
+      await fetch(`http://localhost:5000/api/tarefas/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}` // Mostra o crachá
+        }
+      });
       carregarTarefas();
     } catch (erro) {
       console.error('Erro ao deletar', erro);
@@ -67,7 +86,7 @@ function Tarefas() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '0 auto' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>
-        Tarefas e Projetos ✅
+        Tarefas e Projetos 
       </h1>
 
       <form onSubmit={salvarTarefa} style={{ display: 'flex', gap: '10px', marginBottom: '40px', backgroundColor: '#1e1e1e', padding: '20px', borderRadius: '10px', border: '1px solid #333', flexWrap: 'wrap' }}>
