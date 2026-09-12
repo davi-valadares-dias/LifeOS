@@ -5,18 +5,20 @@ function Sidebar() {
 
   const menuItems = [
     { path: '/', label: 'Dashboard' },
-    { path: '/chat', label: 'Assistente IA' }, // <-- O Cérebro do projeto no menu!
+    { path: '/chat', label: 'Assistente IA' },
     { path: '/financeiro', label: 'Financeiro' },
     { path: '/treinos', label: 'Treinos' },
     { path: '/tarefas', label: 'Tarefas' },
     { path: '/projetos', label: 'Projetos' },
     { path: '/estudos', label: 'Faculdade' },
-    { path: '/calendario', label: 'Calendário' }
+    { path: '/calendario', label: 'Calendário' },
+    { path: '/alimentos', label: 'Base de Alimentos' }, // <-- Botão adicionado
+    { path: '/refeicoes', label: 'Diário de Refeições' } // <-- Botão adicionado
   ];
 
   return (
     <div style={{ width: '250px', backgroundColor: '#1e1e1e', height: '100vh', padding: '20px', borderRight: '1px solid #333', position: 'fixed' }}>
-      <h2 style={{ color: 'white', marginBottom: '30px', textAlign: 'center' }}>LifeOS </h2>
+      <h2 style={{ color: 'white', marginBottom: '30px', textAlign: 'center' }}>LifeOS</h2>
       
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {menuItems.map((item) => (

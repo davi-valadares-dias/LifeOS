@@ -19,6 +19,7 @@ const estudoRoutes = require('./routes/estudoRoutes');
 const eventoRoutes = require('./routes/eventoRoutes');
 const iaRoutes = require('./routes/iaRoutes');
 const authRoutes = require('./routes/authRoutes');
+const nutricaoRoutes = require('./routes/nutricaoRoutes');
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('📦 Banco de dados MongoDB conectado!'))
@@ -33,6 +34,7 @@ app.use('/api/estudos', estudoRoutes);
 app.use('/api/eventos', eventoRoutes);
 app.use('/api/ia', iaRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/nutricao', nutricaoRoutes);
 
 app.get('/api/status', (req, res) => {
   res.json({ message: 'LifeOS API está rodando perfeitamente e conectada ao banco!' });
