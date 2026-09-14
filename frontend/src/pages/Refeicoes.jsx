@@ -17,10 +17,10 @@ function Refeicoes() {
       const token = localStorage.getItem('token');
       const headers = { 'Authorization': `Bearer ${token}` };
 
-      const resRefeicoes = await fetch('http://localhost:5000/api/nutricao/refeicoes', { headers });
+      const resRefeicoes = await fetch('https://lifeos-w4ik.onrender.com/api/nutricao/refeicoes', { headers });
       setRefeicoes(await resRefeicoes.json());
 
-      const resAlimentos = await fetch('http://localhost:5000/api/nutricao/alimentos', { headers });
+      const resAlimentos = await fetch('https://lifeos-w4ik.onrender.com/api/nutricao/alimentos', { headers });
       setAlimentosDB(await resAlimentos.json());
     } catch (erro) {
       console.error('Erro ao buscar dados', erro);
@@ -53,7 +53,7 @@ function Refeicoes() {
 
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:5000/api/nutricao/refeicoes', {
+      await fetch('https://lifeos-w4ik.onrender.com/api/nutricao/refeicoes', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ function Refeicoes() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/nutricao/refeicoes/${id}`, {
+      const response = await fetch(`https://lifeos-w4ik.onrender.com/api/nutricao/refeicoes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

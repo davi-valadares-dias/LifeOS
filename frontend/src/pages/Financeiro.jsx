@@ -16,7 +16,7 @@ function Financeiro() {
   const carregarLancamentos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const resposta = await fetch('http://localhost:5000/api/financeiro', {
+      const resposta = await fetch('https://lifeos-w4ik.onrender.com/api/financeiro', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -34,7 +34,7 @@ function Financeiro() {
 
     try {
       if (editandoId) {
-        await fetch(`http://localhost:5000/api/financeiro/${editandoId}`, {
+        await fetch(`https://lifeos-w4ik.onrender.com/api/financeiro/${editandoId}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ function Financeiro() {
         });
         setEditandoId(null);
       } else {
-        await fetch('http://localhost:5000/api/financeiro', {
+        await fetch('https://lifeos-w4ik.onrender.com/api/financeiro', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ function Financeiro() {
   const deletarLancamento = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/financeiro/${id}`, { 
+      await fetch(`https://lifeos-w4ik.onrender.com/api/financeiro/${id}`, { 
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

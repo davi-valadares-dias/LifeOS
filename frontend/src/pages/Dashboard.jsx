@@ -20,7 +20,7 @@ function Dashboard() {
   const carregarMacrosDoDia = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/nutricao/refeicoes', {
+      const res = await fetch('https://lifeos-w4ik.onrender.com/api/nutricao/refeicoes', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const refeicoes = await res.json();

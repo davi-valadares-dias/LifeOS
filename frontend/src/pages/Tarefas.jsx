@@ -12,7 +12,7 @@ function Tarefas() {
   const carregarTarefas = async () => {
     try {
       const token = localStorage.getItem('token'); // Puxa o crachá
-      const resposta = await fetch('http://localhost:5000/api/tarefas', {
+      const resposta = await fetch('https://lifeos-w4ik.onrender.com/api/tarefas', {
         headers: {
           'Authorization': `Bearer ${token}` // Mostra o crachá
         }
@@ -28,7 +28,7 @@ function Tarefas() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token'); // Puxa o crachá
-      await fetch('http://localhost:5000/api/tarefas', {
+      await fetch('https://lifeos-w4ik.onrender.com/api/tarefas', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ function Tarefas() {
   const atualizarStatus = async (id, novoStatus) => {
     try {
       const token = localStorage.getItem('token'); // Puxa o crachá
-      await fetch(`http://localhost:5000/api/tarefas/${id}`, {
+      await fetch(`https://lifeos-w4ik.onrender.com/api/tarefas/${id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ function Tarefas() {
   const deletarTarefa = async (id) => {
     try {
       const token = localStorage.getItem('token'); // Puxa o crachá
-      await fetch(`http://localhost:5000/api/tarefas/${id}`, { 
+      await fetch(`https://lifeos-w4ik.onrender.com/api/tarefas/${id}`, { 
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}` // Mostra o crachá

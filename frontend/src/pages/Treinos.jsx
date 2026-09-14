@@ -16,7 +16,7 @@ function Treinos() {
   const carregarTreinos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const resposta = await fetch('http://localhost:5000/api/treinos', {
+      const resposta = await fetch('https://lifeos-w4ik.onrender.com/api/treinos', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dados = await resposta.json();
@@ -38,7 +38,7 @@ function Treinos() {
 
     try {
       if (editandoId) {
-        await fetch(`http://localhost:5000/api/treinos/${editandoId}`, {
+        await fetch(`https://lifeos-w4ik.onrender.com/api/treinos/${editandoId}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ function Treinos() {
         });
         setEditandoId(null);
       } else {
-        await fetch('http://localhost:5000/api/treinos', {
+        await fetch('https://lifeos-w4ik.onrender.com/api/treinos', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ function Treinos() {
   const deletarTreino = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/treinos/${id}`, { 
+      await fetch(`https://lifeos-w4ik.onrender.com/api/treinos/${id}`, { 
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

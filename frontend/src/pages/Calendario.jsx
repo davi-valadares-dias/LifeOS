@@ -18,7 +18,7 @@ function Calendario() {
   const carregarEventos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/eventos', {
+      const res = await fetch('https://lifeos-w4ik.onrender.com/api/eventos', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dados = await res.json();
@@ -33,7 +33,7 @@ function Calendario() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:5000/api/eventos', {
+      await fetch('https://lifeos-w4ik.onrender.com/api/eventos', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ function Calendario() {
   const deletarEvento = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/eventos/${id}`, { 
+      await fetch(`https://lifeos-w4ik.onrender.com/api/eventos/${id}`, { 
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

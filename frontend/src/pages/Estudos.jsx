@@ -16,7 +16,7 @@ function Estudos() {
   const carregarEstudos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const resposta = await fetch('http://localhost:5000/api/estudos', {
+      const resposta = await fetch('https://lifeos-w4ik.onrender.com/api/estudos', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dados = await resposta.json();
@@ -38,7 +38,7 @@ function Estudos() {
 
     try {
       if (editandoId) {
-        await fetch(`http://localhost:5000/api/estudos/${editandoId}`, {
+        await fetch(`https://lifeos-w4ik.onrender.com/api/estudos/${editandoId}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ function Estudos() {
         });
         setEditandoId(null);
       } else {
-        await fetch('http://localhost:5000/api/estudos', {
+        await fetch('https://lifeos-w4ik.onrender.com/api/estudos', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ function Estudos() {
   const deletarEstudo = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/estudos/${id}`, { 
+      await fetch(`https://lifeos-w4ik.onrender.com/api/estudos/${id}`, { 
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

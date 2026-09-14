@@ -17,7 +17,7 @@ function Alimentos() {
 const carregarAlimentos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/nutricao/alimentos', {
+      const res = await fetch('https://lifeos-w4ik.onrender.com/api/nutricao/alimentos', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dados = await res.json();
@@ -36,7 +36,7 @@ const carregarAlimentos = async () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:5000/api/nutricao/alimentos', {
+      await fetch('https://lifeos-w4ik.onrender.com/api/nutricao/alimentos', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

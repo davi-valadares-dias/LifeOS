@@ -12,7 +12,7 @@ function Cadastro({ aoCadastrarSucesso }) {
     
     try {
       // Ajuste esta rota caso o seu back-end use outro caminho (ex: /api/auth/register)
-      const response = await fetch('http://localhost:5000/api/auth/registrar', {
+      const response = await fetch('https://lifeos-w4ik.onrender.com/api/auth/registrar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nome, email, senha })

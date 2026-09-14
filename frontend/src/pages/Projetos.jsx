@@ -16,7 +16,7 @@ function Projetos() {
   const carregarProjetos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const resposta = await fetch('http://localhost:5000/api/projetos', {
+      const resposta = await fetch('https://lifeos-w4ik.onrender.com/api/projetos', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const dados = await resposta.json();
@@ -30,7 +30,7 @@ function Projetos() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:5000/api/projetos', {
+      await fetch('https://lifeos-w4ik.onrender.com/api/projetos', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ function Projetos() {
   const deletarProjeto = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/projetos/${id}`, { 
+      await fetch(`https://lifeos-w4ik.onrender.com/api/projetos/${id}`, { 
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

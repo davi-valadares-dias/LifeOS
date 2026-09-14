@@ -21,7 +21,7 @@ function ChatLifeOS() {
   const carregarHistorico = async () => {
     try {
       const token = localStorage.getItem('token'); // Puxa o crachá do navegador
-      const res = await fetch('http://localhost:5000/api/ia/historico', {
+      const res = await fetch('https://lifeos-w4ik.onrender.com/api/ia/historico', {
         headers: {
           'Authorization': `Bearer ${token}` // Mostra o crachá para o segurança
         }
@@ -47,7 +47,7 @@ function ChatLifeOS() {
 
     try {
       const token = localStorage.getItem('token'); // Puxa o crachá do navegador
-      const res = await fetch('http://localhost:5000/api/ia', {
+      const res = await fetch('https://lifeos-w4ik.onrender.com/api/ia', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ function ChatLifeOS() {
     
     try {
       const token = localStorage.getItem('token'); // Puxa o crachá do navegador
-      await fetch('http://localhost:5000/api/ia/limpar', { 
+      await fetch('https://lifeos-w4ik.onrender.com/api/ia/limpar', { 
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}` // Mostra o crachá para o segurança
