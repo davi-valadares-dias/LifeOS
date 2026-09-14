@@ -62,7 +62,7 @@ const carregarAlimentos = async () => {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '900px', margin: '0 auto' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>Base de Alimentos 🍎</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>Base de Alimentos </h1>
 
       <form onSubmit={salvarAlimento} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '40px', backgroundColor: '#1e1e1e', padding: '20px', borderRadius: '10px', border: '1px solid #333' }}>
         <h3 style={{ width: '100%', margin: '0 0 10px 0', color: '#3b82f6' }}>Novo Alimento (Valores para 100g)</h3>
@@ -86,10 +86,10 @@ const carregarAlimentos = async () => {
             <strong style={{ color: '#fff', fontSize: '1.1rem', display: 'block' }}>{item.nome}</strong>
             <span style={{ color: '#a855f7', fontSize: '0.85rem' }}>{item.categoria}</span>
             <div style={{ marginTop: '10px', fontSize: '0.9rem', color: '#aaa', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' }}>
-              <span>🔥 {item.calorias} kcal</span>
-              <span>🥩 {item.proteinas}g Prot</span>
-              <span>🍞 {item.carboidratos}g Carb</span>
-              <span>🥑 {item.gorduras}g Gord</span>
+              <span> {item.calorias} kcal</span>
+              <span> {item.proteinas}g Prot</span>
+              <span> {item.carboidratos}g Carb</span>
+              <span> {item.gorduras}g Gord</span>
             </div>
           </div>
         ))}

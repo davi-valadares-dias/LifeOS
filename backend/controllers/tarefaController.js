@@ -1,54 +1,66 @@
 const Tarefa = require('../models/Tarefa');
 
-const criarTarefa = async (req, res) => {
-  try {
-    const { titulo, categoria } = req.body;
-    const novaTarefa = new Tarefa({ titulo, categoria });
-    const tarefaSalva = await novaTarefa.save();
-    res.status(201).json(tarefaSalva);
-  } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao criar tarefa', erro: erro.message });
-  }
-};
-
+// 1. LISTAR: Busca apenas as tarefas do usuário logado
 const listarTarefas = async (req, res) => {
   try {
-    const tarefas = await Tarefa.find().sort({ dataCriacao: -1 });
+    const donoId = req.usuario.id;
+    const tarefas = await Tarefa.find({ usuarioId: donoId }).sort({ dataCriacao: -1 });
     res.status(200).json(tarefas);
   } catch (erro) {
     res.status(500).json({ mensagem: 'Erro ao buscar tarefas', erro: erro.message });
   }
 };
 
-// Nova função: Atualiza o status da tarefa (ex: de Pendente para Concluída)
-const atualizarStatus = async (req, res) => {
+// 2. CRIAR: Salva a nova tarefa colando a etiqueta do dono
+const criarTarefa = async (req, res) => {
+  try {
+    const donoId = req.usuario.id;
+    const novaTarefa = await Tarefa.create({ 
+      ...req.body, 
+      usuarioId: donoId 
+    });
+    res.status(201).json(novaTarefa);
+  } catch (erro) {
+    res.status(500).json({ mensagem: 'Erro ao criar tarefa', erro: erro.message });
+  }
+};
+
+// 3. ATUALIZAR: Confere se a tarefa existe E se pertence ao usuário
+const atualizarTarefa = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-    const tarefaAtualizada = await Tarefa.findByIdAndUpdate(
-      id, 
-      { status }, 
-      { new: true } // Retorna a tarefa já com o dado novo
+    const donoId = req.usuario.id;
+
+    const tarefaAtualizada = await Tarefa.findOneAndUpdate(
+      { _id: id, usuarioId: donoId }, // Filtro duplo de segurança
+      req.body,
+      { new: true }
     );
+
+    if (!tarefaAtualizada) {
+      return res.status(404).json({ mensagem: 'Tarefa não encontrada ou acesso negado' });
+    }
     res.status(200).json(tarefaAtualizada);
   } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao atualizar status', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro ao atualizar tarefa', erro: erro.message });
   }
 };
 
-const apagarTarefa = async (req, res) => {
+// 4. DELETAR: Confere se a tarefa existe E se pertence ao usuário
+const excluirTarefa = async (req, res) => {
   try {
     const { id } = req.params;
-    await Tarefa.findByIdAndDelete(id);
-    res.status(200).json({ mensagem: 'Tarefa apagada com sucesso!' });
+    const donoId = req.usuario.id;
+
+    const tarefaDeletada = await Tarefa.findOneAndDelete({ _id: id, usuarioId: donoId });
+
+    if (!tarefaDeletada) {
+      return res.status(404).json({ mensagem: 'Tarefa não encontrada ou acesso negado' });
+    }
+    res.status(200).json({ mensagem: 'Tarefa excluída com sucesso' });
   } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao apagar tarefa', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro ao excluir tarefa', erro: erro.message });
   }
 };
 
-module.exports = {
-  criarTarefa,
-  listarTarefas,
-  atualizarStatus,
-  apagarTarefa
-};
+module.exports = { listarTarefas, criarTarefa, atualizarTarefa, excluirTarefa };

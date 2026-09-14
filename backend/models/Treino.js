@@ -1,24 +1,27 @@
 const mongoose = require('mongoose');
 
 const TreinoSchema = new mongoose.Schema({
-  grupoMuscular: {
-    type: String,
-    required: true // Ex: "Costas e Bíceps"
+  usuarioId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Usuario', 
+    required: true 
   },
-  exerciciosFeitos: {
+  grupoMuscular: { 
     type: String, 
-    required: true // Ex: "Puxada 60kg, Remada 30kg, Rosca 15kg"
+    required: true 
   },
-  duracaoMinutos: {
-    type: Number,
-    required: true // Ex: 60
+  exerciciosFeitos: { 
+    type: String, 
+    required: true 
   },
-  data: {
-    type: Date,
-    default: Date.now
+  duracaoMinutos: { 
+    type: Number, 
+    required: true 
+  },
+  data: { 
+    type: Date, 
+    default: Date.now 
   }
-}, { 
-  timestamps: true 
 });
 
 module.exports = mongoose.model('Treino', TreinoSchema);

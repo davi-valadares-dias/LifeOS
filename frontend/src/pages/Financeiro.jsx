@@ -5,8 +5,8 @@ function Financeiro() {
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
   const [tipo, setTipo] = useState('entrada');
+  const [categoria, setCategoria] = useState(''); // Estado da categoria adicionado
   
-  // Novo estado para controlar se estamos criando ou editando
   const [editandoId, setEditandoId] = useState(null);
 
   useEffect(() => {
@@ -15,10 +15,10 @@ function Financeiro() {
 
   const carregarLancamentos = async () => {
     try {
-      const token = localStorage.getItem('token'); // Puxa o crachá
+      const token = localStorage.getItem('token');
       const resposta = await fetch('http://localhost:5000/api/financeiro', {
         headers: {
-          'Authorization': `Bearer ${token}` // Mostra o crachá
+          'Authorization': `Bearer ${token}`
         }
       });
       const dados = await resposta.json();
@@ -30,59 +30,57 @@ function Financeiro() {
 
   const salvarLancamento = async (e) => {
     e.preventDefault(); 
-    
-    const dados = { descricao, valor: Number(valor), tipo };
-    const token = localStorage.getItem('token'); // Puxa o crachá
+    const token = localStorage.getItem('token');
 
     try {
       if (editandoId) {
-        // Se tem um ID em edição, faz um PUT para atualizar
         await fetch(`http://localhost:5000/api/financeiro/${editandoId}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Mostra o crachá
+            'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(dados)
+          // Conversão de valor para Number garantida no envio
+          body: JSON.stringify({ descricao, valor: Number(valor), tipo, categoria })
         });
-        setEditandoId(null); // Sai do modo de edição
+        setEditandoId(null);
       } else {
-        // Se não tem ID, faz um POST para criar
         await fetch('http://localhost:5000/api/financeiro', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Mostra o crachá
+            'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(dados)
+          body: JSON.stringify({ descricao, valor: Number(valor), tipo, categoria })
         });
       }
       
       setDescricao('');
       setValor('');
       setTipo('entrada');
+      setCategoria(''); // Reset da categoria
       carregarLancamentos(); 
     } catch (erro) {
       console.error('Erro ao salvar lançamento', erro);
     }
   };
 
-  // Função para puxar os dados do card para o formulário
   const prepararEdicao = (item) => {
     setDescricao(item.descricao);
     setValor(item.valor);
     setTipo(item.tipo);
+    setCategoria(item.categoria || ''); // Preenche a categoria ao editar
     setEditandoId(item._id);
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const deletarLancamento = async (id) => {
     try {
-      const token = localStorage.getItem('token'); // Puxa o crachá
+      const token = localStorage.getItem('token');
       await fetch(`http://localhost:5000/api/financeiro/${id}`, { 
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}` // Mostra o crachá
+          'Authorization': `Bearer ${token}`
         }
       });
       carregarLancamentos(); 
@@ -96,6 +94,7 @@ function Financeiro() {
     setDescricao('');
     setValor('');
     setTipo('entrada');
+    setCategoria('');
   };
 
   const totalEntradas = lancamentos.filter(i => i.tipo === 'entrada').reduce((acc, i) => acc + i.valor, 0);
@@ -114,6 +113,10 @@ function Financeiro() {
 
       <form onSubmit={salvarLancamento} style={{ display: 'flex', gap: '10px', marginBottom: '40px', backgroundColor: '#1e1e1e', padding: '20px', borderRadius: '10px', border: editandoId ? '1px solid #3b82f6' : '1px solid #333', flexWrap: 'wrap' }}>
         <input type="text" value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Descrição" required style={{ flex: 2, padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', minWidth: '200px' }} />
+        
+        {/* Novo campo de categoria adicionado ao formulário */}
+        <input type="text" value={categoria} onChange={(e) => setCategoria(e.target.value)} placeholder="Categoria (ex: Salário, Lazer)" required style={{ flex: 1, padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', minWidth: '150px' }} />
+        
         <input type="number" value={valor} onChange={(e) => setValor(e.target.value)} placeholder="Valor (R$)" required style={{ flex: 1, padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', minWidth: '100px' }} />
         <select value={tipo} onChange={(e) => setTipo(e.target.value)} style={{ padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}>
           <option value="entrada">Entrada</option>
@@ -137,7 +140,9 @@ function Financeiro() {
           <div key={item._id} style={{ backgroundColor: '#1e1e1e', padding: '15px 20px', borderRadius: '8px', borderLeft: `5px solid ${item.tipo === 'entrada' ? '#4ade80' : '#f87171'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <strong style={{ fontSize: '1.2rem', color: '#fff', display: 'block', marginBottom: '5px' }}>{item.descricao}</strong>
-              <span style={{ color: '#aaa', fontSize: '0.9rem' }}>{new Date(item.data).toLocaleDateString('pt-BR')}</span>
+              <span style={{ color: '#aaa', fontSize: '0.9rem', marginRight: '10px' }}>{new Date(item.data).toLocaleDateString('pt-BR')}</span>
+              {/* Etiqueta visual para exibir a categoria na lista */}
+              <span style={{ color: '#3b82f6', fontSize: '0.85rem', backgroundColor: '#222', padding: '2px 8px', borderRadius: '4px' }}>{item.categoria}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <strong style={{ fontSize: '1.2rem', color: item.tipo === 'entrada' ? '#4ade80' : '#f87171' }}>

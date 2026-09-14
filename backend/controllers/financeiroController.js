@@ -1,62 +1,47 @@
-const Financeiro = require('../models/Lancamento');
-
-const adicionarLancamento = async (req, res) => {
-  try {
-    const dados = req.body;
-    
-    // Fallback: se o modelo exigir categoria e o front não enviar, não deixamos o servidor quebrar
-    if (!dados.categoria) {
-      dados.categoria = 'Geral';
-    }
-
-    const novoLancamento = new Financeiro(dados);
-    const lancamentoSalvo = await novoLancamento.save();
-    res.status(201).json(lancamentoSalvo);
-  } catch (erro) {
-    console.error('❌ Erro no adicionarLancamento:', erro.message); // Agora o erro aparece no terminal!
-    res.status(500).json({ mensagem: 'Erro ao adicionar', erro: erro.message });
-  }
-};
+const Lancamento = require('../models/Lancamento');
 
 const listarLancamentos = async (req, res) => {
   try {
-    const lancamentos = await Financeiro.find().sort({ data: -1 });
+    const lancamentos = await Lancamento.find({ usuarioId: req.usuario.id }).sort({ data: -1 });
     res.status(200).json(lancamentos);
   } catch (erro) {
-    console.error('❌ Erro no listarLancamentos:', erro.message);
-    res.status(500).json({ mensagem: 'Erro ao buscar', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro', erro: erro.message });
+  }
+};
+
+const criarLancamento = async (req, res) => {
+  try {
+    const novoLancamento = await Lancamento.create({ ...req.body, usuarioId: req.usuario.id });
+    res.status(201).json(novoLancamento);
+  } catch (erro) {
+    res.status(500).json({ mensagem: 'Erro', erro: erro.message });
   }
 };
 
 const atualizarLancamento = async (req, res) => {
   try {
     const { id } = req.params;
-    const lancamentoAtualizado = await Financeiro.findByIdAndUpdate(
-      id, 
+    const atualizado = await Lancamento.findOneAndUpdate(
+      { _id: id, usuarioId: req.usuario.id }, 
       req.body, 
-      { returnDocument: 'after' } // Substitui o { new: true } para remover o Warning do Mongoose
+      { new: true }
     );
-    res.status(200).json(lancamentoAtualizado);
+    if (!atualizado) return res.status(404).json({ mensagem: 'Não encontrado ou sem permissão' });
+    res.status(200).json(atualizado);
   } catch (erro) {
-    console.error('❌ Erro no atualizarLancamento:', erro.message);
-    res.status(500).json({ mensagem: 'Erro ao atualizar', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro', erro: erro.message });
   }
 };
 
-const apagarLancamento = async (req, res) => {
+const excluirLancamento = async (req, res) => {
   try {
     const { id } = req.params;
-    await Financeiro.findByIdAndDelete(id);
-    res.status(200).json({ mensagem: 'Apagado com sucesso!' });
+    const deletado = await Lancamento.findOneAndDelete({ _id: id, usuarioId: req.usuario.id });
+    if (!deletado) return res.status(404).json({ mensagem: 'Não encontrado ou sem permissão' });
+    res.status(200).json({ mensagem: 'Excluído com sucesso' });
   } catch (erro) {
-    console.error('❌ Erro no apagarLancamento:', erro.message);
-    res.status(500).json({ mensagem: 'Erro ao apagar', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro', erro: erro.message });
   }
 };
 
-module.exports = { 
-  adicionarLancamento, 
-  listarLancamentos, 
-  atualizarLancamento, 
-  apagarLancamento 
-};
+module.exports = { listarLancamentos, criarLancamento, atualizarLancamento, excluirLancamento };

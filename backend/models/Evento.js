@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 
 const EventoSchema = new mongoose.Schema({
-  titulo: { type: String, required: true }, // Ex: "Prova de Estrutura de Dados"
+  usuarioId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Usuario', 
+    required: true 
+  },
+  titulo: { type: String, required: true }, 
   data: { type: Date, required: true },
   tipo: { type: String, enum: ['Prova', 'Compromisso', 'Lembrete'], default: 'Compromisso' },
   descricao: { type: String }

@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const financeiroController = require('../controllers/financeiroController');
+const { 
+  listarLancamentos, 
+  criarLancamento, 
+  atualizarLancamento, 
+  excluirLancamento 
+} = require('../controllers/financeiroController');
 
-router.post('/', financeiroController.adicionarLancamento);
-router.get('/', financeiroController.listarLancamentos);
-router.put('/:id', financeiroController.atualizarLancamento);
-router.delete('/:id', financeiroController.apagarLancamento);
+// As rotas já estão protegidas pelo authMiddleware lá no server.js
+router.get('/', listarLancamentos);
+router.post('/', criarLancamento);
+router.put('/:id', atualizarLancamento);
+router.delete('/:id', excluirLancamento);
 
 module.exports = router;

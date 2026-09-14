@@ -13,8 +13,8 @@ import Projetos from './pages/Projetos';
 import Estudos from './pages/Estudos';
 import Calendario from './pages/Calendario';
 import ChatLifeOS from './pages/ChatLifeOS';
-import Alimentos from './pages/Alimentos'; // <-- Tela importada
-import Refeicoes from './pages/Refeicoes'; // <-- Tela importada
+import Alimentos from './pages/Alimentos';
+import Refeicoes from './pages/Refeicoes';
 
 function App() {
   const [estaLogado, setEstaLogado] = useState(false);
@@ -37,7 +37,9 @@ function App() {
       <div style={{ backgroundColor: '#121212', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {mostrarCadastro ? (
           <div>
-            <Cadastro />
+            {/* A função é passada aqui para o componente filho */}
+            <Cadastro aoCadastrarSucesso={() => setMostrarCadastro(false)} />
+            
             <p style={{ textAlign: 'center', color: '#fff', cursor: 'pointer', textDecoration: 'underline', marginTop: '10px' }} onClick={() => setMostrarCadastro(false)}>
               Já tem conta? Faça Login
             </p>
@@ -77,8 +79,8 @@ function App() {
             <Route path="/estudos" element={<Estudos />} />
             <Route path="/calendario" element={<Calendario />} />
             <Route path="/chat" element={<ChatLifeOS />} />
-            <Route path="/alimentos" element={<Alimentos />} /> {/* <-- Rota adicionada */}
-            <Route path="/refeicoes" element={<Refeicoes />} /> {/* <-- Rota adicionada */}
+            <Route path="/alimentos" element={<Alimentos />} />
+            <Route path="/refeicoes" element={<Refeicoes />} />
           </Routes>
         </div>
       </div>

@@ -1,49 +1,45 @@
-// Ajuste a linha 1 se o seu Model estiver com nome diferente (ex: '../models/treino')
 const Treino = require('../models/Treino');
-
-const registrarTreino = async (req, res) => {
-  try {
-    const novoTreino = new Treino(req.body);
-    const treinoSalvo = await novoTreino.save();
-    res.status(201).json(treinoSalvo);
-  } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao registrar', erro: erro.message });
-  }
-};
 
 const listarTreinos = async (req, res) => {
   try {
-    const treinos = await Treino.find().sort({ data: -1 });
+    const treinos = await Treino.find({ usuarioId: req.usuario.id }).sort({ data: -1 });
     res.status(200).json(treinos);
   } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao buscar', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro ao buscar treinos', erro: erro.message });
   }
 };
 
-// --- NOVA FUNÇÃO DE EDIÇÃO ---
+const criarTreino = async (req, res) => {
+  try {
+    const novoTreino = await Treino.create({ ...req.body, usuarioId: req.usuario.id });
+    res.status(201).json(novoTreino);
+  } catch (erro) {
+    res.status(500).json({ mensagem: 'Erro ao criar treino', erro: erro.message });
+  }
+};
+
 const atualizarTreino = async (req, res) => {
   try {
-    const { id } = req.params;
-    const treinoAtualizado = await Treino.findByIdAndUpdate(id, req.body, { new: true });
-    res.status(200).json(treinoAtualizado);
+    const atualizado = await Treino.findOneAndUpdate(
+      { _id: req.params.id, usuarioId: req.usuario.id },
+      req.body,
+      { new: true }
+    );
+    if (!atualizado) return res.status(404).json({ mensagem: 'Treino não encontrado ou acesso negado' });
+    res.status(200).json(atualizado);
   } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao atualizar', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro ao atualizar treino', erro: erro.message });
   }
 };
 
-const apagarTreino = async (req, res) => {
+const excluirTreino = async (req, res) => {
   try {
-    const { id } = req.params;
-    await Treino.findByIdAndDelete(id);
-    res.status(200).json({ mensagem: 'Treino apagado!' });
+    const deletado = await Treino.findOneAndDelete({ _id: req.params.id, usuarioId: req.usuario.id });
+    if (!deletado) return res.status(404).json({ mensagem: 'Treino não encontrado ou acesso negado' });
+    res.status(200).json({ mensagem: 'Treino excluído com sucesso' });
   } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao apagar', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro ao excluir treino', erro: erro.message });
   }
 };
 
-module.exports = { 
-  registrarTreino, 
-  listarTreinos, 
-  atualizarTreino, // <-- Nova função exportada
-  apagarTreino 
-};
+module.exports = { listarTreinos, criarTreino, atualizarTreino, excluirTreino };

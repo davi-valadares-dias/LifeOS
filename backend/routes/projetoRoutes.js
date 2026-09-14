@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const projetoController = require('../controllers/projetoController');
+const { 
+  criarProjeto, 
+  listarProjetos, 
+  apagarProjeto 
+} = require('../controllers/projetoController');
 
-router.post('/', projetoController.criarProjeto);
-router.get('/', projetoController.listarProjetos);
-router.delete('/:id', projetoController.apagarProjeto);
+router.post('/', criarProjeto);
+router.get('/', listarProjetos);
+router.delete('/:id', apagarProjeto);
 
 module.exports = router;

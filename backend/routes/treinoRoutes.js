@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const treinoController = require('../controllers/treinoController');
+const { 
+  listarTreinos, 
+  criarTreino, 
+  atualizarTreino, 
+  excluirTreino 
+} = require('../controllers/treinoController');
 
-router.post('/', treinoController.registrarTreino);
-router.get('/', treinoController.listarTreinos);
-
-// --- NOVA ROTA DE EDIÇÃO ---
-router.put('/:id', treinoController.atualizarTreino);
-
-router.delete('/:id', treinoController.apagarTreino);
+router.get('/', listarTreinos);
+router.post('/', criarTreino);
+router.put('/:id', atualizarTreino);
+router.delete('/:id', excluirTreino);
 
 module.exports = router;

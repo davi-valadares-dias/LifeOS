@@ -1,79 +1,79 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
-const Login = ({ aoLogar, irParaCadastro }) => {
+function Login({ aoLogar, irParaCadastro }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [mensagem, setMensagem] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMensagem('');
-
     try {
-      const resposta = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, senha }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
       });
 
-      const dados = await resposta.json();
+      const data = await response.json();
 
-      if (resposta.ok) {
-        setMensagem('✅ Acesso liberado! Entrando...');
-        // 1. Salva o crachá de segurança no navegador
-        localStorage.setItem('token', dados.token);
+      if (response.ok) {
+        // 1. Salva o token (crachá) no navegador
+        localStorage.setItem('token', data.token);
         
-        // 2. Avisa o sistema que o usuário logou (após 1 segundo)
-        setTimeout(() => {
-          aoLogar();
-        }, 1000);
+        // 2. Avisa o sistema que logou
+        aoLogar();
+        
+        // 3. A ALTERAÇÃO: Força o navegador a ir para a raiz do Dashboard, limpando a tela preta
+        window.location.href = '/';
       } else {
-        setMensagem(`❌ Erro: ${dados.mensagem}`);
+        toast.error(data.mensagem || 'Erro ao fazer login.');
       }
     } catch (erro) {
-      setMensagem('❌ Erro de conexão com o servidor.');
+      console.error("Erro no login:", erro);
+      toast.error('Erro de conexão com o servidor.');
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', backgroundColor: '#1e1e1e', color: '#fff', borderRadius: '8px' }}>
-      <h2>Login - LifeOS</h2>
+    <div style={{ backgroundColor: '#1e1e1e', padding: '40px', borderRadius: '10px', width: '350px', border: '1px solid #333' }}>
+      <h2 style={{ color: 'white', textAlign: 'center', marginBottom: '20px' }}>Entrar no LifeOS</h2>
+      
       <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <input 
           type="email" 
           placeholder="Seu E-mail" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
-          style={{ padding: '10px', borderRadius: '4px', border: 'none' }}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{ padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}
         />
         <input 
           type="password" 
           placeholder="Sua Senha" 
-          value={senha} 
-          onChange={(e) => setSenha(e.target.value)} 
-          required 
-          style={{ padding: '10px', borderRadius: '4px', border: 'none' }}
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          required
+          style={{ padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}
         />
-        <button type="submit" style={{ padding: '10px', backgroundColor: '#4CAF50', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+        
+        <button 
+          type="submit" 
+          style={{ padding: '12px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px' }}
+        >
           Entrar
         </button>
       </form>
-      {mensagem && <p style={{ marginTop: '15px', textAlign: 'center' }}>{mensagem}</p>}
-      
-      <p style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px' }}>
-        Não tem uma conta?{' '}
-        <span 
+
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button 
           onClick={irParaCadastro} 
-          style={{ color: '#4CAF50', cursor: 'pointer', textDecoration: 'underline' }}
+          style={{ background: 'transparent', border: 'none', color: '#aaa', cursor: 'pointer', textDecoration: 'underline' }}
         >
-          Cadastre-se
-        </span>
-      </p>
+          Ainda não tem conta? Cadastre-se
+        </button>
+      </div>
     </div>
   );
-};
+}
 
 export default Login;

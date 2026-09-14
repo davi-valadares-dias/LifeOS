@@ -1,75 +1,85 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
-const Cadastro = () => {
+// A propriedade aoCadastrarSucesso é recebida aqui
+function Cadastro({ aoCadastrarSucesso }) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [mensagem, setMensagem] = useState('');
 
   const handleCadastro = async (e) => {
     e.preventDefault();
-    setMensagem(''); // Limpa mensagens anteriores
-
+    
     try {
-      const resposta = await fetch('http://localhost:5000/api/auth/registrar', {
+      // Ajuste esta rota caso o seu back-end use outro caminho (ex: /api/auth/register)
+      const response = await fetch('http://localhost:5000/api/auth/registrar', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nome, email, senha }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, senha })
       });
 
-      const dados = await resposta.json();
+      const data = await response.json();
 
-      if (resposta.ok) {
-        setMensagem('✅ Conta criada com sucesso! Agora você pode fazer login.');
+      if (response.ok) {
+        toast.success('Cadastro realizado com sucesso!');
+        
         // Limpa os campos após o sucesso
         setNome('');
         setEmail('');
         setSenha('');
+
+        // Se a função existir, ela é acionada para voltar para a tela de Login
+        if (aoCadastrarSucesso) {
+          aoCadastrarSucesso();
+        }
       } else {
-        setMensagem(`❌ Erro: ${dados.mensagem}`);
+        toast.error(data.mensagem || 'Erro ao cadastrar.');
       }
     } catch (erro) {
-      setMensagem('❌ Erro de conexão com o servidor.');
+      console.error("Erro no cadastro:", erro);
+      toast.error('Erro de conexão com o servidor.');
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', backgroundColor: '#1e1e1e', color: '#fff', borderRadius: '8px' }}>
-      <h2>Criar Conta - LifeOS</h2>
+    <div style={{ backgroundColor: '#1e1e1e', padding: '40px', borderRadius: '10px', width: '350px', border: '1px solid #333' }}>
+      <h2 style={{ color: 'white', textAlign: 'center', marginBottom: '20px' }}>Criar Conta</h2>
+      
       <form onSubmit={handleCadastro} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <input 
           type="text" 
           placeholder="Seu Nome" 
-          value={nome} 
-          onChange={(e) => setNome(e.target.value)} 
-          required 
-          style={{ padding: '10px', borderRadius: '4px', border: 'none' }}
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+          required
+          style={{ padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}
         />
         <input 
           type="email" 
           placeholder="Seu E-mail" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
-          style={{ padding: '10px', borderRadius: '4px', border: 'none' }}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{ padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}
         />
         <input 
           type="password" 
           placeholder="Sua Senha" 
-          value={senha} 
-          onChange={(e) => setSenha(e.target.value)} 
-          required 
-          style={{ padding: '10px', borderRadius: '4px', border: 'none' }}
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          required
+          style={{ padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}
         />
-        <button type="submit" style={{ padding: '10px', backgroundColor: '#4CAF50', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-          Registrar
+        
+        <button 
+          type="submit" 
+          style={{ padding: '12px', backgroundColor: '#4ade80', color: '#121212', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px' }}
+        >
+          Cadastrar
         </button>
       </form>
-      {mensagem && <p style={{ marginTop: '15px', textAlign: 'center' }}>{mensagem}</p>}
     </div>
   );
-};
+}
 
 export default Cadastro;

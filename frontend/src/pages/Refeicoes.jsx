@@ -5,9 +5,8 @@ function Refeicoes() {
   const [refeicoes, setRefeicoes] = useState([]);
   const [alimentosDB, setAlimentosDB] = useState([]);
   
-  // Estado do formulário
   const [tipo, setTipo] = useState('Almoço');
-  const [itens, setItens] = useState([{ alimentoId: '', quantidadeGramas: '' }]);
+  const [itens, setItens] = useState([{ alimentoId: '', quantidadeGramas: '', buscaNome: '', mostrarResultados: false }]);
 
   useEffect(() => {
     carregarDados();
@@ -29,7 +28,7 @@ function Refeicoes() {
   };
 
   const adicionarItemInput = () => {
-    setItens([...itens, { alimentoId: '', quantidadeGramas: '' }]);
+    setItens([...itens, { alimentoId: '', quantidadeGramas: '', buscaNome: '', mostrarResultados: false }]);
   };
 
   const atualizarItem = (index, campo, valor) => {
@@ -46,10 +45,9 @@ function Refeicoes() {
   const salvarRefeicao = async (e) => {
     e.preventDefault();
     
-    // Filtra itens vazios para evitar erros
     const itensValidos = itens.filter(i => i.alimentoId && i.quantidadeGramas);
     if (itensValidos.length === 0) {
-      toast.error('Adicione pelo menos um alimento válido!');
+      toast.error('Selecione os alimentos na lista suspensa antes de salvar!');
       return;
     }
 
@@ -65,7 +63,7 @@ function Refeicoes() {
       });
       
       setTipo('Almoço');
-      setItens([{ alimentoId: '', quantidadeGramas: '' }]);
+      setItens([{ alimentoId: '', quantidadeGramas: '', buscaNome: '', mostrarResultados: false }]);
       carregarDados();
       toast.success('Refeição registrada com sucesso!');
     } catch (erro) {
@@ -73,14 +71,40 @@ function Refeicoes() {
     }
   };
 
+  const deletarRefeicao = async (id) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta refeição?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/nutricao/refeicoes/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        toast.success('Refeição excluída!');
+        setRefeicoes(refeicoes.filter(ref => ref._id !== id));
+      } else {
+        toast.error('Erro ao excluir refeição. Talvez você não seja o dono dela.');
+      }
+    } catch (erro) {
+      toast.error('Erro de conexão ao excluir');
+    }
+  };
+
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '0 auto' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>Diário de Refeições 🍽️</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '2rem' }}>Diário de Refeições </h1>
 
       <form onSubmit={salvarRefeicao} style={{ backgroundColor: '#1e1e1e', padding: '25px', borderRadius: '10px', border: '1px solid #333', marginBottom: '40px' }}>
+        
         <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', color: '#ccc', marginBottom: '8px' }}>Tipo de Refeição</label>
-          <select value={tipo} onChange={(e) => setTipo(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}>
+          <select 
+            value={tipo} 
+            onChange={(e) => setTipo(e.target.value)} 
+            style={{ width: '100%', padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', boxSizing: 'border-box' }}
+          >
             <option value="Café da manhã">Café da manhã</option>
             <option value="Lanche da manhã">Lanche da manhã</option>
             <option value="Almoço">Almoço</option>
@@ -94,27 +118,66 @@ function Refeicoes() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '20px' }}>
           <label style={{ color: '#ccc' }}>Alimentos Consumidos</label>
+          
           {itens.map((item, index) => (
             <div key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <select 
-                value={item.alimentoId} 
-                onChange={(e) => atualizarItem(index, 'alimentoId', e.target.value)}
-                required
-                style={{ flex: 2, padding: '10px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white' }}
-              >
-                <option value="">Selecione um alimento...</option>
-                {alimentosDB.map(alimento => (
-                  <option key={alimento._id} value={alimento._id}>{alimento.nome}</option>
-                ))}
-              </select>
+              
+              <div style={{ position: 'relative', flex: 1, width: '100%' }}>
+                <input 
+                  type="text" 
+                  placeholder="Buscar alimento (ex: Arroz)..." 
+                  value={item.buscaNome} 
+                  onChange={(e) => {
+                    const novosItens = [...itens];
+                    novosItens[index].buscaNome = e.target.value;
+                    novosItens[index].alimentoId = ''; 
+                    novosItens[index].mostrarResultados = true;
+                    setItens(novosItens);
+                  }}
+                  onFocus={() => atualizarItem(index, 'mostrarResultados', true)}
+                  onBlur={() => atualizarItem(index, 'mostrarResultados', false)}
+                  required
+                  style={{ width: '100%', padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', boxSizing: 'border-box' }}
+                />
+                
+                {item.mostrarResultados && item.buscaNome && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, maxHeight: '250px', overflowY: 'auto', backgroundColor: '#333', border: '1px solid #555', borderRadius: '5px', zIndex: 50, marginTop: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+                    {alimentosDB
+                      .filter(a => a.nome.toLowerCase().includes(item.buscaNome.toLowerCase()))
+                      .slice(0, 50) 
+                      .map(alimento => (
+                        <div 
+                          key={alimento._id} 
+                          onMouseDown={() => {
+                            const novosItens = [...itens];
+                            novosItens[index].alimentoId = alimento._id;
+                            novosItens[index].buscaNome = alimento.nome;
+                            novosItens[index].mostrarResultados = false;
+                            setItens(novosItens);
+                          }}
+                          style={{ padding: '12px', cursor: 'pointer', color: 'white', borderBottom: '1px solid #444', fontSize: '0.95rem' }}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = '#4ade80'}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                        >
+                          {alimento.nome}
+                        </div>
+                    ))}
+                    {alimentosDB.filter(a => a.nome.toLowerCase().includes(item.buscaNome.toLowerCase())).length === 0 && (
+                      <div style={{ padding: '12px', color: '#aaa', fontStyle: 'italic' }}>Nenhum alimento encontrado.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
               <input 
                 type="number" 
-                placeholder="Gramas" 
+                placeholder="Gramas (g)" 
                 value={item.quantidadeGramas} 
                 onChange={(e) => atualizarItem(index, 'quantidadeGramas', e.target.value)}
                 required
-                style={{ flex: 1, padding: '10px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', maxWidth: '100px' }}
+                style={{ width: '120px', padding: '12px', borderRadius: '5px', border: '1px solid #444', backgroundColor: '#222', color: 'white', boxSizing: 'border-box' }}
               />
+              
               {itens.length > 1 && (
                 <button type="button" onClick={() => removerItem(index)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>❌</button>
               )}
@@ -136,9 +199,19 @@ function Refeicoes() {
         {refeicoes.length === 0 && <p style={{ color: '#888', textAlign: 'center' }}>Nenhuma refeição registrada hoje.</p>}
         {refeicoes.map(ref => (
           <div key={ref._id} style={{ backgroundColor: '#1e1e1e', padding: '20px', borderRadius: '10px', borderLeft: '5px solid #4ade80' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-              <strong style={{ fontSize: '1.2rem', color: '#fff' }}>{ref.tipo}</strong>
-              <span style={{ color: '#888' }}>{new Date(ref.data).toLocaleDateString('pt-BR')}</span>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <div>
+                <strong style={{ fontSize: '1.2rem', color: '#fff' }}>{ref.tipo}</strong>
+                <span style={{ color: '#888', marginLeft: '10px' }}>{new Date(ref.data).toLocaleDateString('pt-BR')}</span>
+              </div>
+              <button 
+                onClick={() => deletarRefeicao(ref._id)} 
+                title="Excluir Refeição"
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#f87171' }}
+              >
+                🗑️
+              </button>
             </div>
             
             <ul style={{ color: '#ccc', paddingLeft: '20px', marginBottom: '15px' }}>
@@ -147,12 +220,14 @@ function Refeicoes() {
               ))}
             </ul>
 
-            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', backgroundColor: '#222', padding: '10px', borderRadius: '8px' }}>
+            {/* BARRA DE MACROS ATUALIZADA COM OS NOMES */}
+            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', backgroundColor: '#222', padding: '12px', borderRadius: '8px' }}>
               <span style={{ color: '#f87171', fontWeight: 'bold' }}>🔥 {ref.totais.calorias.toFixed(0)} kcal</span>
-              <span style={{ color: '#3b82f6' }}>🥩 {ref.totais.proteinas.toFixed(1)}g</span>
-              <span style={{ color: '#fbbf24' }}>🍞 {ref.totais.carboidratos.toFixed(1)}g</span>
-              <span style={{ color: '#a855f7' }}>🥑 {ref.totais.gorduras.toFixed(1)}g</span>
+              <span style={{ color: '#3b82f6' }}>🥩 Proteína: {ref.totais.proteinas.toFixed(1)}g</span>
+              <span style={{ color: '#fbbf24' }}>🥖 Carbo: {ref.totais.carboidratos.toFixed(1)}g</span>
+              <span style={{ color: '#a855f7' }}>🥑 Gordura: {ref.totais.gorduras.toFixed(1)}g</span>
             </div>
+
           </div>
         ))}
       </div>

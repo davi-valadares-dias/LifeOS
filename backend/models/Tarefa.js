@@ -1,25 +1,29 @@
 const mongoose = require('mongoose');
 
 const TarefaSchema = new mongoose.Schema({
-  titulo: {
-    type: String,
-    required: true // Ex: "Entregar trabalho de Python", "Criar logo do Work Match"
+  // NOVA LINHA OBRIGATÓRIA: Etiqueta do dono da tarefa
+  usuarioId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Usuario', 
+    required: true 
   },
-  categoria: {
-    type: String,
-    required: true // Ex: "Faculdade", "Projetos", "Pessoal"
+  titulo: { 
+    type: String, 
+    required: true 
   },
-  status: {
-    type: String,
-    enum: ['Pendente', 'Em Andamento', 'Concluída'],
-    default: 'Pendente' // Toda tarefa nova nasce como Pendente
+  categoria: { 
+    type: String, 
+    default: 'Geral' 
   },
-  dataCriacao: {
-    type: Date,
-    default: Date.now
+  status: { 
+    type: String, 
+    enum: ['Pendente', 'Concluída'], 
+    default: 'Pendente' 
+  },
+  dataCriacao: { 
+    type: Date, 
+    default: Date.now 
   }
-}, { 
-  timestamps: true 
 });
 
 module.exports = mongoose.model('Tarefa', TarefaSchema);

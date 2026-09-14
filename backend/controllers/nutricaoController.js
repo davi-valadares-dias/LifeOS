@@ -24,6 +24,7 @@ const criarAlimento = async (req, res) => {
 const registrarRefeicao = async (req, res) => {
   try {
     const { tipo, data, itens } = req.body;
+    const donoId = req.usuario.id;
     let totais = { calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0, acucares: 0 };
     const itensProcessados = [];
 
@@ -49,7 +50,8 @@ const registrarRefeicao = async (req, res) => {
       tipo,
       data: data || new Date(),
       itens: itensProcessados,
-      totais
+      totais,
+      usuarioId: donoId
     });
 
     res.status(201).json(novaRefeicao);
@@ -60,11 +62,30 @@ const registrarRefeicao = async (req, res) => {
 
 const listarRefeicoes = async (req, res) => {
   try {
-    const refeicoes = await Refeicao.find().sort({ data: -1 }).populate('itens.alimentoId');
+    const donoId = req.usuario.id; // <-- Pega o ID de quem tá logado
+    const refeicoes = await Refeicao.find({ usuarioId: donoId }).sort({ data: -1 }); // <-- Filtra pelo dono
     res.status(200).json(refeicoes);
   } catch (erro) {
-    res.status(500).json({ mensagem: 'Erro ao buscar refeições', erro: erro.message });
+    res.status(500).json({ mensagem: 'Erro', erro: erro.message });
   }
 };
 
-module.exports = { listarAlimentos, criarAlimento, registrarRefeicao, listarRefeicoes };
+// Função para DELETAR uma refeição (Com proteção multi-usuário)
+const excluirRefeicao = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const donoId = req.usuario.id; // Garante que só exclui se for o dono
+
+    const refeicaoDeletada = await Refeicao.findOneAndDelete({ _id: id, usuarioId: donoId });
+
+    if (!refeicaoDeletada) {
+      return res.status(404).json({ mensagem: 'Refeição não encontrada ou acesso negado' });
+    }
+    
+    res.status(200).json({ mensagem: 'Refeição excluída com sucesso' });
+  } catch (erro) {
+    res.status(500).json({ mensagem: 'Erro ao excluir refeição', erro: erro.message });
+  }
+};
+
+module.exports = { listarAlimentos, criarAlimento, registrarRefeicao, listarRefeicoes, excluirRefeicao };

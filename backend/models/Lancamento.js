@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const LancamentoSchema = new mongoose.Schema({
+  usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
   tipo: {
     type: String,
     required: true,
