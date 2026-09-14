@@ -1,16 +1,40 @@
-# React + Vite
+# LifeOS - Plataforma SaaS de Produtividade Pessoal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sistema full-stack desenvolvido para gerenciamento de rotina pessoal, estruturado com foco em arquitetura multi-tenant, segurança de dados e automação por inteligência artificial.
 
-Currently, two official plugins are available:
+## Visão Geral
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+O LifeOS centraliza módulos essenciais do dia a dia em uma interface unificada, garantindo o isolamento completo de dados entre diferentes usuários e integração com modelos de linguagem para processamento de comandos em linguagem natural.
 
-## React Compiler
+## Tecnologias Utilizadas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Back-end
 
-## Expanding the ESLint configuration
+* Node.js / Express.js
+* MongoDB / Mongoose
+* JSON Web Tokens (JWT) / Bcrypt
+* Google Generative AI SDK
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Front-end
+
+* React.js
+* React Calendar / React Hot Toast
+
+## Módulos do Sistema
+
+1. **Autenticação:** Sistema de registro e controle de acesso baseado em tokens JWT com isolamento estrito de dados por ID de usuário (`usuarioId`).
+2. **Financeiro:** Controle de fluxo de caixa, entradas, saídas, cálculo de saldo e categorização de lançamentos.
+3. **Treinos:** Registro de histórico de exercícios, grupos musculares e duração de sessões.
+4. **Estudos:** Gerenciamento de disciplinas acadêmicas, corpo docente e controle de frequência.
+5. **Projetos:** Portfólio técnico para documentação de software, tecnologias aplicadas e links de repositórios.
+6. **Calendário:** Agenda interativa para mapeamento de eventos, avaliações e compromissos.
+7. **Nutrição:** Acompanhamento de refeições e cálculo automatizado de macronutrientes.
+8. **Assistente de IA:** Módulo integrado para interpretação de comandos textuais e execução automatizada de operações no banco de dados.
+
+## Arquitetura de Segurança
+
+O sistema implementa barreiras de isolamento lógico:
+
+* Associação obrigatória de entidades de domínio ao identificador do usuário autenticado.
+* Interceptação de requisições por middleware de validação de token para injeção de escopo de sessão.
+* Restrição de consultas a escopos autorizados em operações de leitura, atualização e exclusão.
